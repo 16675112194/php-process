@@ -1,32 +1,38 @@
 <?php
 // +----------------------------------------------------------------------
-// |  
-// | app.php
-// | 
+// |
+// | Consumer.php
+// |
 // +----------------------------------------------------------------------
 // | Copyright (c) https://www.56br.com/ All rights reserved.
 // +----------------------------------------------------------------------
 // | Author:  wll <wanglelecc@gmail.com>
 // +----------------------------------------------------------------------
-// | Date: 2020-01-28 11:28
+// | Date: 2020-01-31 14:34
 // +----------------------------------------------------------------------
 
-return [
-    // 应用名称
-    "name"     => "php-process",
+namespace App\Consumer;
 
-    /*
-     * 环境
-     * 可选值:
-     *        develop       => 开发,
-     *        test          => 测试,
-     *        staging       => 预发布,
-     *        production    => 生产
+/**
+ * 进程消费基类
+ *
+ * @package App\Consumer
+ *
+ * @Author wll
+ * @Time 2020-01-31 14:55
+ */
+abstract class Consumer
+{
+
+    /**
+     * 构造方法
+     *
+     * Consumer constructor.
      */
-    "env"      => "develop",
+	public function __construct()
+	{
 
-    // 时区
-    "timezone" => "Asia/Shanghai",
+	}
 
 
-];
+}
