@@ -13,6 +13,7 @@
 
 namespace App\Consumer;
 
+use Wanglelecc\Process\Worker;
 use Wanglelecc\Business\Callback;
 
 /**
@@ -25,7 +26,7 @@ use Wanglelecc\Business\Callback;
  */
 class Demo extends Consumer implements Callback
 {
-    public function handle(): void
+    public function handle(Worker $worker): void
     {
 
     }

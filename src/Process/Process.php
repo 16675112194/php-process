@@ -73,7 +73,7 @@ abstract class Process
      *
      * @var string
      */
-    protected $pipeNamePrefix = '';
+    protected $pipeNamePrefix = 'process.pipe';
 
     /**
      * 管道存储的文件夹
@@ -95,13 +95,6 @@ abstract class Process
      * @var integer
      */
     protected $readPipeType = 1024;
-
-    /**
-     * 进程终止标记位
-     *
-     * @var boolean
-     */
-    protected $workerExitFlag = false;
 
     /**
      * 信号
@@ -126,7 +119,6 @@ abstract class Process
      *
      * @var int
      */
-//	protected static $maxExecuteTimes = 5 * 60 * 60 * 24;
     protected static $maxExecuteTimes = 60 * 60 * 24;
 
     /**
@@ -143,7 +135,7 @@ abstract class Process
      *
      * @var Logger
      */
-    protected $logger = null;
+    public $logger = null;
 
     /**
      * Process constructor
@@ -151,6 +143,9 @@ abstract class Process
     public function __construct()
     {
         $this->logger = Logger::getInstance();
+
+        $this->pipeDir        = pipe_path();
+        $this->pipeNamePrefix = $this->cliName . '.pipe';
 
         $this->initialize();
     }
@@ -163,7 +158,14 @@ abstract class Process
      */
     protected function initialize()
     {
+        if (empty($this->pid)) {
+            $this->pid = posix_getpid();
+        }
 
+        $this->cliName = config('app.name', 'php-process');
+
+        $this->pipeName = $this->pipeNamePrefix . '.' . $this->pid;
+        $this->pipePath = $this->pipeDir . '.' . $this->pipeName;
     }
 
     /**
@@ -171,16 +173,16 @@ abstract class Process
      *
      * @return void
      */
-    public function pipeMake() :void
+    public function pipeMake(): void
     {
-        if ( !file_exists( $this->pipePath ) ) {
-            if ( !posix_mkfifo( $this->pipePath, $this->pipeMode ) ) {
-                $this->logger && $this->logger->error("pipe make {$this->pipePath}" );
+        if (!file_exists($this->pipePath)) {
+            if (!posix_mkfifo($this->pipePath, $this->pipeMode)) {
+                $this->logger && $this->logger->error("pipe make {$this->pipePath}");
                 exit;
             }
 
-            chmod( $this->pipePath, $this->pipeMode );
-            $this->logger && $this->logger->info( "pipe make {$this->pipePath}");
+            chmod($this->pipePath, $this->pipeMode);
+            $this->logger && $this->logger->info("pipe make {$this->pipePath}");
         }
     }
 
@@ -189,34 +191,34 @@ abstract class Process
      *
      * @return void
      */
-    public function pipeWrite($signal = '') :void
+    public function pipeWrite($signal = ''): void
     {
-        $pipe = fopen( $this->pipePath, 'w' );
-        if ( !$pipe ) {
-            $this->logger && $this->logger->error( "pipe open {$this->pipePath}");
+        $pipe = fopen($this->pipePath, 'w');
+        if (!$pipe) {
+            $this->logger && $this->logger->error("pipe open {$this->pipePath}");
             return;
         }
 
         $this->logger && $this->logger->info("pipe open {$this->pipePath}");
 
-        $res = fwrite( $pipe, $signal );
-        if ( !$res ) {
-            $this->logger && $this->logger->error(  [
-                    'msg'  => "pipe write {$this->pipePath}",
-                    'signal' => $signal,
-                    'res'    => $res,
-                ]);
-            return;
-        }
-
-        $this->logger && info( [
-                'msg'  => "pipe write {$this->pipePath}",
+        $res = fwrite($pipe, $signal);
+        if (!$res) {
+            $this->logger && $this->logger->error([
+                'msg'    => "pipe write {$this->pipePath}",
                 'signal' => $signal,
                 'res'    => $res,
             ]);
+            return;
+        }
 
-        if ( !fclose( $pipe ) ) {
-            $this->logger && $this->logger->error( "pipe close {$this->pipePath}");
+        $this->logger && info([
+            'msg'    => "pipe write {$this->pipePath}",
+            'signal' => $signal,
+            'res'    => $res,
+        ]);
+
+        if (!fclose($pipe)) {
+            $this->logger && $this->logger->error("pipe close {$this->pipePath}");
             return;
         }
 
@@ -231,26 +233,26 @@ abstract class Process
     public function pipeRead()
     {
         // check pipe
-        while ( !file_exists( $this->pipePath ) ) {
-            usleep( self::$hangupLoopMicrotime );
+        while (!file_exists($this->pipePath)) {
+            usleep(self::$hangupLoopMicrotime);
         }
 
         // open pipe
         do {
             // fopen() will block if the file to be opened is a fifo. This is true whether it's opened in "r" or "w" mode.  (See man 7 fifo: this is the correct, default behaviour; although Linux supports non-blocking fopen() of a fifo, PHP doesn't).
-            $workerPipe = fopen( $this->pipePath, 'r+' ); // The "r+" allows fopen to return immediately regardless of external  writer channel.
-            usleep( self::$hangupLoopMicrotime );
-        } while ( !$workerPipe );
+            $workerPipe = fopen($this->pipePath, 'r+'); // The "r+" allows fopen to return immediately regardless of external  writer channel.
+            usleep(self::$hangupLoopMicrotime);
+        } while (!$workerPipe);
 
         // set pipe switch a non blocking stream
-        stream_set_blocking( $workerPipe, false );
+        stream_set_blocking($workerPipe, false);
 
         // read pipe
-        if ( $msg = fread( $workerPipe, $this->readPipeType ) ) {
+        if ($msg = fread($workerPipe, $this->readPipeType)) {
             $this->logger && $this->logger->info([
-                    'msg'  => "pipe read {$this->pipePath}",
-                    'signal' => $msg,
-                ]);
+                'msg'    => "pipe read {$this->pipePath}",
+                'signal' => $msg,
+            ]);
         }
 
         return $msg;
@@ -261,17 +263,17 @@ abstract class Process
      *
      * @return bool
      */
-    public function clearPipe() : bool
+    public function clearPipe(): bool
     {
         $msg = "pipe clear {$this->pipePath}";
 
-        $this->logger && $this->logger->info( $msg );
+        $this->logger && $this->logger->info($msg);
 
-        if ( !unlink( $this->pipePath ) ) {
-            $this->logger && $this->logger->error( $msg );
+        if (!unlink($this->pipePath)) {
+            $this->logger && $this->logger->error($msg);
             return false;
         }
-        shell_exec( "rm -f {$this->pipePath}" );
+        shell_exec("rm -f {$this->pipePath}");
         return true;
     }
 
@@ -284,11 +286,11 @@ abstract class Process
     {
         $msg = "{$this->pid} stop";
 
-        $this->logger && $this->logger->info( $msg );
+        $this->logger && $this->logger->info($msg);
 
         $this->clearPipe();
-        if ( !posix_kill( $this->pid, SIGKILL ) ) {
-            $this->logger && $this->logger->error( $msg );
+        if (!posix_kill($this->pid, SIGKILL)) {
+            $this->logger && $this->logger->error($msg);
             return false;
         }
 
@@ -306,8 +308,8 @@ abstract class Process
         $os = strtolower(php_uname('s'));
 
         // 只有在 linux 环境下才可以设置进程名称
-        if( strlen($os) > 4 && substr($os, 0, 5) == 'linux' ){
-            cli_set_process_title( $this->cliName . ': ' . $this->type . ' process' );
+        if (strlen($os) > 4 && substr($os, 0, 5) == 'linux') {
+            cli_set_process_title($this->cliName . ': ' . $this->type . ' process');
         }
     }
 

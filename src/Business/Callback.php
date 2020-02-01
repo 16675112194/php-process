@@ -13,8 +13,9 @@
 
 namespace Wanglelecc\Business;
 
+use Wanglelecc\Process\Worker;
 
 interface Callback
 {
-    public function handle() : void;
+    public function handle(Worker $worker) : void;
 }

@@ -157,6 +157,28 @@ if( !function_exists('tmp_path') )
     }
 }
 
+if( !function_exists('pipe_path') )
+{
+    /**
+     * 获取 pipe 路径
+     *
+     * @return string
+     *
+     * @author wll <wanglelecc@gmail.com>
+     * @date 2020-01-31 17:37
+     */
+    function pipe_path(){
+
+        $dir = config('path.pipe', 'pipe');
+
+        if( substr($dir,0, 1) == '/' ){
+            return $dir;
+        }
+
+        return storage_path() . DIRECTORY_SEPARATOR . $dir;
+    }
+}
+
 if( !function_exists('log_file_path') )
 {
     /**
