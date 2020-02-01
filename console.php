@@ -79,6 +79,11 @@ switch ($cmd){
     case 'stop':
         Manager::getInstance()->stop(SIGTERM);
         break;
+    case 'status':
+        Manager::getInstance()->status();
+    case 'list':
+        Manager::getInstance()->status();
+        break;
     case 'debug':
         var_dump(config('cache'));
         break;
