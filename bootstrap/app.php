@@ -11,6 +11,7 @@
 // | Date: 2020-01-31 14:02
 // +----------------------------------------------------------------------
 
-define('BASE_PATH', dirname(__DIR__));
+require  BASE_PATH . DIRECTORY_SEPARATOR . 'vendor/autoload.php';
 
-require __DIR__ . '/../vendor/autoload.php';
+// set timezone
+date_default_timezone_set( config('app.timezone', 'Asia/Shanghai') );

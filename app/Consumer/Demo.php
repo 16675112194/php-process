@@ -13,11 +13,10 @@
 
 namespace App\Consumer;
 
-use Wanglelecc\Process\Worker;
 use Wanglelecc\Business\Callback;
 
 /**
- * 消费者实例
+ * 消费者示例
  *
  * @package App\Consumer
  *
@@ -26,8 +25,10 @@ use Wanglelecc\Business\Callback;
  */
 class Demo extends Consumer implements Callback
 {
-    public function handle(Worker $worker): void
+    public function handle(): void
     {
+        $this->logger->debug('wll....');
 
+        sleep(2);
     }
 }

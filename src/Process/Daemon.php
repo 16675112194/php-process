@@ -23,7 +23,7 @@ use Wanglelecc\Exceptions\SystemException;
  * @Author wll
  * @Time 2020-01-31 15:15
  */
-abstract class Daemon
+class Daemon
 {
     use Singleton;
 
@@ -70,7 +70,7 @@ abstract class Daemon
      * @author wll <wanglelecc@gmail.com>
      * @date 2020-01-31 16:25
      */
-    protected function daemonize(): void
+    public function daemonize(): void
     {
         global $stdin, $stdout, $stderr;
 

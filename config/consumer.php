@@ -1,7 +1,7 @@
 <?php
 // +----------------------------------------------------------------------
 // |
-// | cache.php
+// | consumer.php
 // |
 // +----------------------------------------------------------------------
 // | Copyright (c) https://www.56br.com/ All rights reserved.
@@ -13,11 +13,10 @@
 
 return [
     "demo" => [
-        "name"            => "demo",
-        "callbackClass"   => "\App\Consumer\Demo",
-        "workerName"      => "Demo",
-        "workerNum"       => 4,
+        "workerName"      => "demo",
+        "workerNum"       => 1,
         "consumeSharding" => true,
+        "consumeClass"    => "\App\Consumer\Demo",
         "consumeConfig"   => [
 
         ],

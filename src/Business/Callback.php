@@ -17,5 +17,7 @@ use Wanglelecc\Process\Worker;
 
 interface Callback
 {
-    public function handle(Worker $worker) : void;
+    public function setWorker(Worker $worker) :void;
+
+    public function handle() : void;
 }

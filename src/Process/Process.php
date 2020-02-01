@@ -27,11 +27,18 @@ use Wanglelecc\Exceptions\SystemException;
 abstract class Process
 {
     /**
+     * 应用名称
+     *
+     * @var string
+     */
+    protected $appName = '';
+
+    /**
      * 进程名称
      *
      * @var string
      */
-    public $cliName = '';
+    protected $workerName = '';
 
     /**
      * 临时目录
@@ -53,6 +60,13 @@ abstract class Process
      * @var int
      */
     public $pid = '';
+
+    /**
+     * 进程消费组序
+     *
+     * @var int
+     */
+    public $index = -1;
 
     /**
      * 管道名称
@@ -162,10 +176,50 @@ abstract class Process
             $this->pid = posix_getpid();
         }
 
-        $this->cliName = config('app.name', 'php-process');
+        $this->appName = config('app.name', 'php-process');
+        $this->tmpDir  = tmp_path();
 
         $this->pipeName = $this->pipeNamePrefix . '.' . $this->pid;
         $this->pipePath = $this->pipeDir . '.' . $this->pipeName;
+    }
+
+    /**
+     * 设置进程 pid
+     *
+     * @param int $pid
+     *
+     * @author wll <wanglelecc@gmail.com>
+     * @date 2020-02-01 19:41
+     */
+    public function setPid(int $pid) :void
+    {
+        $this->pid = $pid;
+    }
+
+    /**
+     * 设置进程消费组序
+     *
+     * @param int $index
+     *
+     * @author wll <wanglelecc@gmail.com>
+     * @date 2020-02-01 19:46
+     */
+    public function setIndex(int $index) :void
+    {
+        $this->index = $index;
+    }
+
+    /**
+     * 设置进程名称
+     *
+     * @param string $workerName
+     *
+     * @author wll <wanglelecc@gmail.com>
+     * @date 2020-02-01 19:13
+     */
+    public function setWorkerName(string $workerName) :void
+    {
+        $this->workerName = $workerName;
     }
 
     /**
@@ -173,7 +227,7 @@ abstract class Process
      *
      * @return void
      */
-    public function pipeMake(): void
+    public function makePipe(): void
     {
         if (!file_exists($this->pipePath)) {
             if (!posix_mkfifo($this->pipePath, $this->pipeMode)) {
@@ -309,7 +363,10 @@ abstract class Process
 
         // 只有在 linux 环境下才可以设置进程名称
         if (strlen($os) > 4 && substr($os, 0, 5) == 'linux') {
-            cli_set_process_title($this->cliName . ': ' . $this->type . ' process');
+
+            $workerName = empty($this->workerName) ? '' : ".{$this->workerName}";
+
+            cli_set_process_title( "{$this->appName}: {$this->type}{$workerName} process" );
         }
     }
 
