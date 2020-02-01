@@ -21,7 +21,7 @@ return [
     /*
      * 默认创建日志文件权限
      */
-    'permission' => 0666,
+    'permission' => 0777,
 
     /*
      * 是否 json 格式

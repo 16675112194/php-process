@@ -166,7 +166,22 @@ class Logger
     {
         $message = $this->formatMessage($message);
 
-        error_log($this->decorate($level, $message, $context), 3, log_file_path($this->logName));
+        $logFile = log_file_path($this->logName);
+
+        try{
+            $logDir = dirname( $logFile );
+            if ( !file_exists( $logDir ) ) {
+                mkdir( $logDir, config('logging.permission', 0777), true );
+            }else{
+                chmod($logDir, config('logging.permission', 0777));
+            }
+
+            error_log($this->decorate($level, $message, $context), 3, $logFile);
+        }catch (\Exception $exception){
+            echo $exception->getMessage();
+            exit;
+        }
+
     }
 
 
@@ -210,11 +225,13 @@ class Logger
      *
      * @param string $level
      * @param string $message
+     * @param array $context
+     * @param array $extra
      *
-     * @return string
+     * @return false|string
      *
      * @author wll <wanglelecc@gmail.com>
-     * @date 2020-01-31 23:03
+     * @date 2020-02-01 22:28
      */
     private function decorate($level = 'info', $message = '', $context = [], $extra = [])
     {
@@ -246,17 +263,17 @@ class Logger
             'message'      => $message,
             'pid'          => $pid,
             'memory_usage' => $memoryUsage,
-            'context'      => $context,
-            'extra'        => $extra,
+            'context'      => json_encode($context, JSON_UNESCAPED_UNICODE),
+            'extra'        => json_encode($extra, JSON_UNESCAPED_UNICODE),
         ];
 
         // 命令行模式下输出日志内容
         if (php_sapi_name() == 'cli') {
-            echo implode(' | ', $msg) . PHP_EOL;
+            echo implode(' | ', array_values($msg)) . PHP_EOL;
         }
 
         $msg['level'] = $level;
 
-        return $this->isJson ? json_encode($msg, JSON_UNESCAPED_UNICODE) : implode(' | ', $msg) . PHP_EOL;
+        return $this->isJson ? json_encode($msg, JSON_UNESCAPED_UNICODE) . PHP_EOL : implode(' | ', $msg) . PHP_EOL;
     }
 }

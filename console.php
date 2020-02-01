@@ -85,7 +85,7 @@ switch ($cmd){
         Manager::getInstance()->status();
         break;
     case 'debug':
-        var_dump(config('cache'));
+        Wanglelecc\Log\Logger::getInstance()->info('test...');
         break;
     default :
         $help();

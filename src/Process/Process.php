@@ -158,8 +158,11 @@ abstract class Process
     {
         $this->logger = Logger::getInstance();
 
+        $this->appName = config('app.name', 'php-process');
+        $this->tmpDir  = tmp_path();
+
         $this->pipeDir        = pipe_path();
-        $this->pipeNamePrefix = $this->cliName . '.pipe';
+        $this->pipeNamePrefix = $this->appName . '.pipe';
 
         $this->initialize();
     }
@@ -176,11 +179,8 @@ abstract class Process
             $this->pid = posix_getpid();
         }
 
-        $this->appName = config('app.name', 'php-process');
-        $this->tmpDir  = tmp_path();
-
         $this->pipeName = $this->pipeNamePrefix . '.' . $this->pid;
-        $this->pipePath = $this->pipeDir . '.' . $this->pipeName;
+        $this->pipePath = $this->pipeDir . DIRECTORY_SEPARATOR . $this->pipeName;
     }
 
     /**

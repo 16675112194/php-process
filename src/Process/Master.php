@@ -46,10 +46,11 @@ class Master extends Process
      */
     public function __construct()
     {
-        $this->type    = 'master';
-        $this->pidFile = $this->tmpDir . DIRECTORY_SEPARATOR . $this->type . '.' . $this->pidFile;
+        $this->type = 'master';
 
         parent::__construct();
+
+        $this->pidFile = $this->tmpDir . DIRECTORY_SEPARATOR . $this->type . '.' . $this->pidFile;
     }
 
     /**
@@ -58,14 +59,14 @@ class Master extends Process
      * @author wll <wanglelecc@gmail.com>
      * @date 2020-02-01 15:42
      */
-    public function makePid() :void
+    public function makePid(): void
     {
-        $pidDir = dirname( $this->pidFile );
-        if ( !file_exists( $pidDir ) ) {
-            mkdir( $pidDir, $this->pipeMode, true );
+        $pidDir = dirname($this->pidFile);
+        if (!file_exists($pidDir)) {
+            mkdir($pidDir, $this->pipeMode, true);
         }
 
-        file_put_contents( $this->pidFile, posix_getpid() );
+        file_put_contents($this->pidFile, posix_getpid());
     }
 
     /**
@@ -74,10 +75,10 @@ class Master extends Process
      * @author wll <wanglelecc@gmail.com>
      * @date 2020-02-01 15:43
      */
-    public function clearPid() :void
+    public function clearPid(): void
     {
-        if ( file_exists( $this->pidFile ) ) {
-            unlink( $this->pidFile );
+        if (file_exists($this->pidFile)) {
+            unlink($this->pidFile);
         }
     }
 
@@ -89,7 +90,7 @@ class Master extends Process
      * @author wll <wanglelecc@gmail.com>
      * @date 2020-02-01 15:50
      */
-    public function getPid() :int
+    public function getPid(): int
     {
         if (file_exists($this->pidFile)) {
             return intval(file_get_contents($this->pidFile));
@@ -106,7 +107,7 @@ class Master extends Process
      * @author wll <wanglelecc@gmail.com>
      * @date 2020-02-01 15:53
      */
-    public function status() :bool
+    public function status(): bool
     {
         return $this->checkPidFile();
     }
@@ -119,7 +120,7 @@ class Master extends Process
      * @author wll <wanglelecc@gmail.com>
      * @date 2020-02-01 15:49
      */
-    protected function checkPid() :bool
+    protected function checkPid(): bool
     {
         if (file_exists($this->pidFile)) {
 

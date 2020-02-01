@@ -160,7 +160,7 @@ class Manager
         ];
 
         // 执行 fork worker 操作
-        $this->execFork(config('consumer', []));
+//        $this->execFork(config('consumer', []));
 
         // 注册信号处理
         $this->registerSigHandler();
@@ -217,7 +217,7 @@ class Manager
 \033[36m
 56BR.COM
 			
-An object-oriented multi process manager for PHP
+Multi process manager for PHP
 
 Author: wll <wanglelecc@gmail.com>
 Github: https://github.com/wanglelecc/php-process
@@ -355,7 +355,7 @@ WELCOME;
 
                 // fork 子进程
                 forkWorkerProcess:
-                $this->fork($worker->getWorkerManagerParams());
+//                $this->fork($worker->getWorkerManagerParams());
             }
 
             // 停止信号
@@ -394,6 +394,7 @@ WELCOME;
     {
         foreach($consumers as $consumer){
             for($index = 0; $index < $consumer['workerNum'] ?: 1; $index++ ){
+                $consumer['index'] = $index;
                 $this->fork($consumer);
             }
         }
