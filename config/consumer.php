@@ -1,8 +1,8 @@
 <?php
 // +----------------------------------------------------------------------
-// |  
-// | app.php
-// | 
+// |
+// | consumer.php
+// |
 // +----------------------------------------------------------------------
 // | Copyright (c) https://www.56br.com/ All rights reserved.
 // +----------------------------------------------------------------------
@@ -12,21 +12,13 @@
 // +----------------------------------------------------------------------
 
 return [
-    // 应用名称
-    "name"     => "php-process",
+    "demo" => [
+        "workerName"      => "demo",
+        "workerNum"       => 4,
+        "consumeSharding" => true,
+        "consumeClass"    => "\App\Consumer\Demo",
+        "consumeConfig"   => [
 
-    /*
-     * 环境
-     * 可选值:
-     *        develop       => 开发,
-     *        test          => 测试,
-     *        staging       => 预发布,
-     *        production    => 生产
-     */
-    "env"      => "develop",
-
-    // 时区
-    "timezone" => "Asia/Shanghai",
-
-
+        ],
+    ],
 ];

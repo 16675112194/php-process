@@ -1,32 +1,26 @@
 <?php
 // +----------------------------------------------------------------------
 // |  
-// | app.php
+// | bootstrap.php
 // | 
 // +----------------------------------------------------------------------
 // | Copyright (c) https://www.56br.com/ All rights reserved.
 // +----------------------------------------------------------------------
 // | Author:  wll <wanglelecc@gmail.com>
 // +----------------------------------------------------------------------
-// | Date: 2020-01-28 11:28
+// | Date: 2020-01-31 14:02
 // +----------------------------------------------------------------------
 
-return [
-    // 应用名称
-    "name"     => "php-process",
+use Wanglelecc\ExceptionHandle\HandleExceptions;
 
-    /*
-     * 环境
-     * 可选值:
-     *        develop       => 开发,
-     *        test          => 测试,
-     *        staging       => 预发布,
-     *        production    => 生产
-     */
-    "env"      => "develop",
-
-    // 时区
-    "timezone" => "Asia/Shanghai",
+// 设置时区
+date_default_timezone_set('Asia/Shanghai' );
 
 
-];
+// 载入Autoload
+require  BASE_PATH . DIRECTORY_SEPARATOR . 'vendor/autoload.php';
+
+// 注册异常处理
+HandleExceptions::getInstance()->bootstrap();
+
+

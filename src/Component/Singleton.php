@@ -1,8 +1,8 @@
 <?php
 // +----------------------------------------------------------------------
-// |  
-// | app.php
-// | 
+// |
+// | Singleton.php
+// |
 // +----------------------------------------------------------------------
 // | Copyright (c) https://www.56br.com/ All rights reserved.
 // +----------------------------------------------------------------------
@@ -11,22 +11,24 @@
 // | Date: 2020-01-28 11:28
 // +----------------------------------------------------------------------
 
-return [
-    // 应用名称
-    "name"     => "php-process",
+namespace Wanglelecc\Component;
 
-    /*
-     * 环境
-     * 可选值:
-     *        develop       => 开发,
-     *        test          => 测试,
-     *        staging       => 预发布,
-     *        production    => 生产
-     */
-    "env"      => "develop",
+/**
+ * 单例 Trait
+ * @package Wanglelecc\Component
+ *
+ * @Author wll
+ * @Time 2020-01-31 15:15
+ */
+trait Singleton
+{
+    private static $instance;
 
-    // 时区
-    "timezone" => "Asia/Shanghai",
-
-
-];
+    public static function getInstance(...$args)
+    {
+        if(!isset(self::$instance)){
+            self::$instance = new static(...$args);
+        }
+        return self::$instance;
+    }
+}
