@@ -146,7 +146,7 @@ class Master extends Process
      * @author wll <wanglelecc@gmail.com>
      * @date 2020-02-02 09:19
      */
-    public function clearAllPipe() :void
+    private function clearAllPipe() :void
     {
         $files = scandir($this->pipeDir);
         $result = [];
@@ -164,6 +164,32 @@ class Master extends Process
                 }
             }
         }
+    }
+
+    /**
+     * 终止 master 进程
+     *
+     * @author wll <wanglelecc@gmail.com>
+     * @date 2020-02-01 14:52
+     */
+    public function masterExit() :void
+    {
+        $this->logger && $this->logger->info('master process exit');
+
+        // 清除管道
+        $this->clearPipe();
+
+        // 清除PID
+        $this->clearPid();
+
+        sleep(5);
+
+        // 清除残余管道文件
+        $this->clearAllPipe();
+
+        echo "master process exit...", PHP_EOL;
+
+        exit;
     }
 
 }

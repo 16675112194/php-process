@@ -286,7 +286,7 @@ abstract class Process
 
         $res = fwrite($pipe, $signal);
         if (!$res) {
-            $this->logger && $this->logger->error([
+            $this->logger && $this->logger->error("pipe write signal: {$signal}", [
                 'msg'    => "pipe write {$this->pipePath}",
                 'signal' => $signal,
                 'res'    => $res,
@@ -294,7 +294,7 @@ abstract class Process
             return;
         }
 
-        $this->logger && info([
+        $this->logger && $this->logger->info("pipe write signal: {$signal}", [
             'msg'    => "pipe write {$this->pipePath}",
             'signal' => $signal,
             'res'    => $res,
@@ -332,10 +332,7 @@ abstract class Process
 
         // read pipe
         if ($msg = fread($workerPipe, $this->readPipeType)) {
-            $this->logger && $this->logger->info([
-                'msg'    => "pipe read {$this->pipePath}",
-                'signal' => $msg,
-            ]);
+            $this->logger && $this->logger->debug( "pipe read signal: {$msg}");
         }
 
         return $msg;
@@ -397,9 +394,9 @@ abstract class Process
         // 只有在 linux 环境下才可以设置进程名称
         if (strlen($os) > 4 && substr($os, 0, 5) == 'linux') {
 
-            $workerName = empty($this->workerName) ? '' : ".{$this->workerName}";
+            $workerName = empty($this->workerName) ? '' : " ({$this->workerName})";
 
-            cli_set_process_title( "{$this->appName}: {$this->type}{$workerName} process" );
+            cli_set_process_title( "{$this->appName}: {$this->type} process{$workerName}" );
         }
     }
 

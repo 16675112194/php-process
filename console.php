@@ -73,10 +73,10 @@ switch ($cmd){
     case 'reload':
         Manager::getInstance()->stop(SIGUSR1);
         break;
-    case 'quit':
+    case 'stop':
         Manager::getInstance()->stop(SIGUSR2);
         break;
-    case 'stop':
+    case 'quit': // terminate
         Manager::getInstance()->stop(SIGTERM);
         break;
     case 'status':

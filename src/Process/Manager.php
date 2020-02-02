@@ -137,6 +137,12 @@ class Manager
      */
     public function start(string $env)
     {
+        // 检查是否正在运行中
+        if($this->master->status()){
+            echo date('Y-m-d H:i:s').' The '.$this->appName.' is running.'.PHP_EOL;
+            exit;
+        }
+
         // 守护进程模式
         if($env == 'pro'){
             $this->daemon->daemonize();
@@ -267,18 +273,8 @@ WELCOME;
                     $v->pipeWrite('stop');
                 }
 
-                // clear pipe
-                $this->master->clearPipe();
-                $this->master->clearPid();
-
-                sleep(3);
-                $this->master->clearAllPipe();
-                // kill -9 master process
-                echo "master stop... \n";
-                exit;
-
                 break;
-
+            // Control + C
             case $this->signalSupport['int']:
 
                 $this->waitSignal = 'stop';
@@ -298,17 +294,11 @@ WELCOME;
                     $this->logger && $this->logger->info("kill -SIGKILL {$v->getPid()}", $context);
                 }
 
-                // clear pipe
-                $this->master->clearPipe();
-                $this->master->clearPid();
+                $this->master->masterExit();
 
-                sleep(3);
-                $this->master->clearAllPipe();
-                // kill -9 master process
-                echo "master stop... \n";
                 exit;
                 break;
-
+            // quit
             case $this->signalSupport['terminate']:
 
                 $this->waitSignal = 'stop';
@@ -322,14 +312,8 @@ WELCOME;
                 }
 
                 // clear pipe
-                $this->master->clearPipe();
-                $this->master->clearPid();
+                $this->master->masterExit();
 
-                sleep(3);
-                $this->master->clearAllPipe();
-
-                // kill -9 master process
-                echo "master stop... \n";
                 exit;
                 break;
 
@@ -370,7 +354,7 @@ WELCOME;
                 if ($res > 0) {
                     // 停止信号，进程结束从 workers 池中释放
                     if($this->waitSignal === 'stop' || $this->waitSignal === 'reload'){
-                        unset($this->workers[$res]);
+                        unset($this->workers[$worker->getKey()]);
                         continue;
                     }
 
@@ -393,14 +377,12 @@ WELCOME;
                 // 子进程都停止后停止主进程
                 if (empty($this->workers)) {
 
-                    $this->master->stop();
-
-                    sleep(1);
-
                     if($this->waitSignal === 'reload'){
                         // 启动一个新的自己
                         // $this->master->start();
                     }
+
+                    $this->master->masterExit();
                 }
             }
 
