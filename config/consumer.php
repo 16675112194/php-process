@@ -13,12 +13,12 @@
 
 return [
     "demo" => [
-        "workerName"      => "demo",
-        "workerNum"       => 4,
-        "consumeSharding" => true,
-        "consumeClass"    => "\App\Consumer\Demo",
+        "workerName"      => "demo",                // 进程名称也是消费者名称
+        "workerNum"       => 4,                     // 进程数量
+        "consumeSharding" => true,                  // 消费类型: true => 切片, false => 单片
+        "consumeClass"    => "\App\Consumer\Demo",  // 业务消费类
         "consumeConfig"   => [
 
-        ],
+        ],                                          // 消费者参数，需要与消费者的构造方法参数一一对应，默认为空
     ],
 ];

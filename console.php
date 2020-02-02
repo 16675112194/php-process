@@ -15,6 +15,7 @@ define('BASE_PATH', getcwd());
 
 require BASE_PATH . DIRECTORY_SEPARATOR . "bootstrap/app.php";
 
+use Wanglelecc\Log\Logger;
 use Wanglelecc\Process\Manager;
 
 /**
@@ -70,7 +71,7 @@ switch ($cmd){
     case 'start':
         Manager::getInstance()->start($env);
         break;
-    case 'reload':
+    case 'restart': // reload / restart
         Manager::getInstance()->stop(SIGUSR1);
         break;
     case 'stop':
@@ -88,6 +89,7 @@ switch ($cmd){
     case 'debug':
         Wanglelecc\Log\Logger::getInstance()->info('test...');
         break;
+    case 'help':
     default :
         $help();
         break;
