@@ -118,8 +118,11 @@ class Manager
         // 初始化主进程实例
         $this->master = Master::getInstance();
 
-        // 初始化守护进程对象实例
+        // 初始化守护进程实例
         $this->daemon = Daemon::getInstance();
+
+        // 初始化日志实例
+        $this->logger = Logger::getInstance();
     }
 
     /**
@@ -160,7 +163,7 @@ class Manager
         ];
 
         // 执行 fork worker 操作
-//        $this->execFork(config('consumer', []));
+        $this->execFork(config('consumer', []));
 
         // 注册信号处理
         $this->registerSigHandler();
@@ -263,42 +266,68 @@ WELCOME;
                 foreach ($this->workers as $v) {
                     $v->pipeWrite('stop');
                 }
+
+                // clear pipe
+                $this->master->clearPipe();
+                $this->master->clearPid();
+
+                sleep(3);
+                $this->master->clearAllPipe();
+                // kill -9 master process
+                echo "master stop... \n";
+                exit;
+
                 break;
 
             case $this->signalSupport['int']:
+
+                $this->waitSignal = 'stop';
+                $this->signalVer++;
+
                 foreach ($this->workers as $v) {
                     // clear pipe
                     $v->clearPipe();
                     // kill -9 all worker process
-                    $result = posix_kill($v->pid, SIGKILL);
+                    $result = posix_kill($v->getPid(), SIGKILL);
 
                     $context = [
                         'from'   => $this->master->type,
-                        'extra'  => "kill -SIGKILL {$v->pid}",
+                        'extra'  => "kill -SIGKILL {$v->getPid()}",
                         'result' => $result,
                     ];
-
-                    $this->logger->info("kill -SIGKILL {$v->pid}", $context);
+                    $this->logger && $this->logger->info("kill -SIGKILL {$v->getPid()}", $context);
                 }
 
                 // clear pipe
                 $this->master->clearPipe();
                 $this->master->clearPid();
+
+                sleep(3);
+                $this->master->clearAllPipe();
                 // kill -9 master process
                 echo "master stop... \n";
                 exit;
                 break;
 
             case $this->signalSupport['terminate']:
+
+                $this->waitSignal = 'stop';
+                $this->signalVer++;
+
                 foreach ($this->workers as $v) {
                     // clear pipe
                     $v->clearPipe();
                     // kill -9 all worker process
-                    posix_kill($v->pid, SIGKILL);
+                    posix_kill($v->getPid(), SIGKILL);
                 }
+
                 // clear pipe
                 $this->master->clearPipe();
                 $this->master->clearPid();
+
+                sleep(3);
+                $this->master->clearAllPipe();
+
                 // kill -9 master process
                 echo "master stop... \n";
                 exit;
@@ -337,7 +366,7 @@ WELCOME;
 
             foreach ($this->workers as $k => $worker) {
                 // 获取子进程的状态信息，防止子进程成为僵尸进程
-                $res = pcntl_waitpid($worker->pid, $status, WNOHANG);
+                $res = pcntl_waitpid($worker->getPid(), $status, WNOHANG);
                 if ($res > 0) {
                     // 停止信号，进程结束从 workers 池中释放
                     if($this->waitSignal === 'stop' || $this->waitSignal === 'reload'){
@@ -349,13 +378,14 @@ WELCOME;
                 }
 
                 // 检查进程是否存活
-                if( posix_kill($worker->pid, 0) ){
+                if( posix_kill($worker->getPid(), 0) ){
                     continue;
                 }
 
                 // fork 子进程
                 forkWorkerProcess:
-//                $this->fork($worker->getWorkerManagerParams());
+                $worker->clearPipe(); // 清除意外退出的进程残留的管道文件
+                $this->fork($worker->getWorkerManagerParams());
             }
 
             // 停止信号
@@ -393,7 +423,7 @@ WELCOME;
     public function execFork($consumers = []) :void
     {
         foreach($consumers as $consumer){
-            for($index = 0; $index < $consumer['workerNum'] ?: 1; $index++ ){
+            for($index = 0; $index < ($consumer['workerNum'] ?: 1); $index++ ){
                 $consumer['index'] = $index;
                 $this->fork($consumer);
             }

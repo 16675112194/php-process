@@ -27,8 +27,8 @@ class Demo extends Consumer implements Callback
 {
     public function handle(): void
     {
-        $this->logger->debug('wll....');
+        $this->logger->debug("PID:{$this->pid}, Inx:{$this->index} wll.....");
 
-        sleep(2);
+        sleep(3);
     }
 }

@@ -109,7 +109,7 @@ class Master extends Process
      */
     public function status(): bool
     {
-        return $this->checkPidFile();
+        return $this->checkPid();
     }
 
     /**
@@ -131,11 +131,39 @@ class Master extends Process
                 return true;
             } else {
                 unlink($this->pidFile);
-                return false;
             }
         }
 
+        // 未运行状态清除残留管道文件
+        $this->clearAllPipe();
+
         return false;
+    }
+
+    /**
+     * 批量清除残留的管道文件
+     *
+     * @author wll <wanglelecc@gmail.com>
+     * @date 2020-02-02 09:19
+     */
+    public function clearAllPipe() :void
+    {
+        $files = scandir($this->pipeDir);
+        $result = [];
+        foreach ($files as $file) {
+            if ($file != '.' && $file != '..' && $file != '.gitgnore' && substr( $file, 0, strlen($this->pipeNamePrefix) ) == $this->pipeNamePrefix) {
+                if (is_dir($this->pipeDir . '/' . $file)) {
+                    continue;
+                } else {
+                    $result[] = $filename = $this->pipeDir . DIRECTORY_SEPARATOR . basename($file);
+                    if(file_exists($filename)){
+                        unlink($filename);
+                        shell_exec("rm -f {$filename}");
+                    }
+
+                }
+            }
+        }
     }
 
 }

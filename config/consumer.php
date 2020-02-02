@@ -14,8 +14,8 @@
 return [
     "demo" => [
         "workerName"      => "demo",
-        "workerNum"       => 1,
-        "consumeSharding" => true,
+        "workerNum"       => 4,
+        "consumeSharding" => false,
         "consumeClass"    => "\App\Consumer\Demo",
         "consumeConfig"   => [
 

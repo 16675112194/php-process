@@ -61,7 +61,7 @@ abstract class Consumer
      */
     public function __construct()
     {
-
+        $this->logger = Logger::getInstance();
     }
 
     /**
@@ -74,9 +74,8 @@ abstract class Consumer
      */
     public function setWorker(Worker $worker): void
     {
-        $this->pid    = $worker->pid;
-        $this->index  = $worker->index;
-        $this->logger = $worker->logger;
         $this->worker = $worker;
+        $this->pid    = $worker->getPid();
+        $this->index  = $worker->getIndex();
     }
 }

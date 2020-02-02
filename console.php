@@ -81,6 +81,7 @@ switch ($cmd){
         break;
     case 'status':
         Manager::getInstance()->status();
+        break;
     case 'list':
         Manager::getInstance()->status();
         break;

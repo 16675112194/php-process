@@ -59,14 +59,14 @@ abstract class Process
      *
      * @var int
      */
-    public $pid = '';
+    protected $pid = '';
 
     /**
      * 进程消费组序
      *
      * @var int
      */
-    public $index = -1;
+    protected $index = -1;
 
     /**
      * 管道名称
@@ -194,6 +194,22 @@ abstract class Process
     public function setPid(int $pid) :void
     {
         $this->pid = $pid;
+
+        // pid 修改后重新初始化
+        $this->initialize();
+    }
+
+    /**
+     * 获取进程 pid
+     *
+     * @return int
+     *
+     * @author wll <wanglelecc@gmail.com>
+     * @date 2020-02-02 11:02
+     */
+    public function getPid() :int
+    {
+        return $this->pid;
     }
 
     /**
@@ -207,6 +223,19 @@ abstract class Process
     public function setIndex(int $index) :void
     {
         $this->index = $index;
+    }
+
+    /**
+     * 获取进程消费组序
+     *
+     * @return int
+     *
+     * @author wll <wanglelecc@gmail.com>
+     * @date 2020-02-02 11:03
+     */
+    public function getIndex() :int
+    {
+        return $this->index;
     }
 
     /**
@@ -319,9 +348,13 @@ abstract class Process
      */
     public function clearPipe(): bool
     {
-        $msg = "pipe clear {$this->pipePath}";
+        $msg = "{$this->type} pipe clear {$this->pipePath}";
 
         $this->logger && $this->logger->info($msg);
+
+        if( !file_exists($this->pipePath) ){
+            return true;
+        }
 
         if (!unlink($this->pipePath)) {
             $this->logger && $this->logger->error($msg);
