@@ -272,7 +272,10 @@ abstract class Process
     /**
      * 将消息写入管道
      *
-     * @return void
+     * @param string $signal
+     *
+     * @author wll <wanglelecc@gmail.com>
+     * @date 2020-02-02 19:31
      */
     public function pipeWrite($signal = ''): void
     {
@@ -311,7 +314,10 @@ abstract class Process
     /**
      * 从管道读取消息
      *
-     * @return mixed
+     * @return bool|string
+     *
+     * @author wll <wanglelecc@gmail.com>
+     * @date 2020-02-02 19:31
      */
     public function pipeRead()
     {
@@ -342,6 +348,9 @@ abstract class Process
      * 清除管道文件
      *
      * @return bool
+     *
+     * @author wll <wanglelecc@gmail.com>
+     * @date 2020-02-02 19:31
      */
     public function clearPipe(): bool
     {
@@ -365,6 +374,9 @@ abstract class Process
      * 停止当前进程
      *
      * @return bool
+     *
+     * @author wll <wanglelecc@gmail.com>
+     * @date 2020-02-02 19:31
      */
     public function stop(): bool
     {
