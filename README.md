@@ -46,7 +46,7 @@ php console.php start
 ```
 
 ### 启动状态
-![启动状态](https://wanglelecc.oss-cn-beijing.aliyuncs.com/github/php-process/welcome.png)
+<img src="https://wanglelecc.oss-cn-beijing.aliyuncs.com/github/php-process/welcome.png">
 
 ### 可用命令
 ```bash
@@ -112,7 +112,7 @@ return [
 ];
 ```
 ### 进程状态
-![进程状态](https://wanglelecc.oss-cn-beijing.aliyuncs.com/github/php-process/php-process.png)
+<img src="https://wanglelecc.oss-cn-beijing.aliyuncs.com/github/php-process/php-process.png">
 
 ## 项目地址
 Github: https://github.com/wanglelecc/php-process
